@@ -1,6 +1,7 @@
 function FirebaseJS(config){
 	"use strict";
 	let _FirebaseJS = this;
+	this.Auth = () => firebase.auth().currentUser;
 	function EventWrapper(/* eventnames,... */){
 		let Events = {};
 		for(let i=0;i<arguments.length;i++)
@@ -18,14 +19,25 @@ function FirebaseJS(config){
 			})
 		}
 	}
+	this.SignInGoogle = () => {
+		firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
+	}
+	this.SignOut = () => {
+		firebase.auth().signOut();
+	}
+	const EventHandler = EventWrapper("signin","signout");
+	this.On = (eventname,callback) => EventHandler.On(eventname,callback);
+	this.Call = (eventname) => EventHandler.Call(eventname);
+	this.EventQueue = (eventname) => EventHandler.Queue(eventname);
 	this.FirebaseObject = function(path) {
 		"use strict";
-		const EventHandler = EventWrapper("get","changed");
+		const FirebaseObjectEventHandler = EventWrapper("get","changed");
 		this.Path = path;
 		this.Name = null;
 		this.Value = null;
-		this.On = (eventname,callback) => EventHandler.On(eventname,callback);
-		this.Call = (eventname) => EventHandler.Call(eventname);
+		this.On = (eventname,callback) => FirebaseObjectEventHandler.On(eventname,callback);
+		this.Call = (eventname) => FirebaseObjectEventHandler.Call(eventname);
+		this.EventQueue = (eventname) => FirebaseObjectEventHandler.Queue(eventname);
 		this.Get = () => {
 			_FirebaseJS.Connection.Ref.child(path).on("value", (snapshot) => {
 				if(this.Value == null) {
@@ -49,7 +61,7 @@ function FirebaseJS(config){
 		Ref : null
 	}
 	this.Get = (path,callback) => {
-		this.Connection.Ref.child(path).on("value", (snapshot) => {
+		_FirebaseJS.Connection.Ref.child(path).on("value", (snapshot) => {
 			callback(snapshot.val());
 		}, (errorObject) => {
 			callback(null);
@@ -64,8 +76,11 @@ function FirebaseJS(config){
 		else return null;
 	}
 	this.Initialize = () => {
-		this.Connection.App = firebase.initializeApp(config);
-		this.Connection.Ref = this.Connection.App.database().ref();
+		_FirebaseJS.Connection.App = firebase.initializeApp(config);
+		_FirebaseJS.Connection.Ref = _FirebaseJS.Connection.App.database().ref();
+		firebase.auth().onAuthStateChanged((user) => {
+			_FirebaseJS.Call((user == null) ? "signout" : "signin");
+		});
 	}
 	this.Initialize();
 }

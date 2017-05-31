@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<title>Chat BETA</title>
+	<title>Chat v2.0 BETA</title>
 	<link rel="stylesheet prefetch" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.1.2/css/material-design-iconic-font.min.css" />
 	<link rel="stylesheet" href="css/style.css" />
 	<script type="text/javascript" src="js/firebase-app.js"></script>
@@ -15,7 +15,9 @@
 </head>
 <body>
 	<div id="enterroom">
-		<input type="text" id="auth" placeholder="Nick"/>
+		<button id="signin" onclick="FJS.SignInGoogle();">Sign In</button>
+		<button id="signout" style="display:none;" onclick="FJS.SignOut();">Sign Out</button>
+		<button onclick="$('#joinroom').val('Kayıp Balık Memo Firebase\'de');EnterRoom();">Kayıp Balık Memo Firebase'de</button>
 		<input type="text" id="joinroom" placeholder="Room Name"/>
 		<button id="join" onclick="EnterRoom();">Join</button>
 	</div>
@@ -52,7 +54,7 @@
               </div>
               <div class="name">
                 <span id="room_name"></span>
-                <span class="status username" id="active_users">BETA</span>
+                <span class="status username">BETA</span>
               </div>
             </div>
             <div class="conversation">
